@@ -1,6 +1,6 @@
 SEMESTER='2017fall'
-# datasource='http://giraffe.uvm.edu/~rgweb/batch/curr_enroll_spring.txt'
-datasource='http://giraffe.uvm.edu/~rgweb/batch/curr_enroll_fall.txt'
+# datasource='https://giraffe.uvm.edu/~rgweb/batch/curr_enroll_spring.txt'
+datasource='https://giraffe.uvm.edu/~rgweb/batch/curr_enroll_fall.txt'
 
 if [[ ! -d out ]]; then
   mkdir out
