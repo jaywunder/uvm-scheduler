@@ -8,7 +8,7 @@ export let courseToObj = course => {
   campcode: course[6],
   collcode: course[7],
   maxEnroll: course[8],
-  currEnroll: course[9],
+  currentEnroll: course[9],
   startTime: course[10],
   endTime: course[11],
   days: course[12],

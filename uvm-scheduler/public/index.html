@@ -36,19 +36,5 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
-    <script type="text/javascript">
-    (async function() {
-
-      const cors = 'https://cors-anywhere.herokuapp.com/'
-      const url = 'giraffe.uvm.edu:443/~rgweb/batch/curr_enroll_fall.txt'
-      // const url = 'https://giraffe.uvm.edu/~rgweb/batch/curr_enroll_fall.txt'
-      const text = await fetch(cors+url).then(response => response.text())
-      // .then(console.log)
-      console.log('text', text)
-
-
-
-    })()
-    </script>
   </body>
 </html>
