@@ -5,9 +5,14 @@
   "dependencies": {
     "antd": "^2.12.5",
     "comma-separated-values": "^3.6.4",
+    "fuzzysearch": "^1.0.3",
+    "prop-types": "^15.5.10",
     "react": "^15.6.1",
+    "react-autosuggest": "^9.3.2",
     "react-dom": "^15.6.1",
-    "react-scripts": "1.0.10"
+    "react-redux": "^5.0.6",
+    "react-scripts": "1.0.10",
+    "redux": "^3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
