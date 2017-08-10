@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { coursesSuccess } from './state/actions'
 import { subscribe, unsubscribe } from './util/state'
 import CSV from 'comma-separated-values'
+import csvFile from './assets/courses.csv'
+// console.log('csvFile', csvFile)
 
 export default class StateManager extends Component {
   componentWillMount() {
@@ -29,11 +31,12 @@ export default class StateManager extends Component {
   fetchCourses = async () => {
     this.fetchingCourses = true
 
-    const cors = 'https://cors-anywhere.herokuapp.com/'
-    const url = 'giraffe.uvm.edu:443/~rgweb/batch/curr_enroll_fall.txt'
+    // const cors = 'https://cors-anywhere.herokuapp.com/'
+    // const url = 'giraffe.uvm.edu:443/~rgweb/batch/curr_enroll_fall.txt'
     const s = 'String', n = 'Number', b = 'Boolean'
 
-    const text = await fetch(cors+url).then(response => response.text())
+    // const text = await fetch(cors+url).then(response => response.text())
+    const text = await fetch(csvFile).then(response => response.text())
     const rows = text.split('\n')
       .map(row => row.replace(/("|,| |\d\d:\d\d|@uvm.edu)/g, ''))
 

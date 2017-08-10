@@ -3,27 +3,52 @@
   --light-green: #8bb138;
 }
 
+* {
+  outline: none;
+}
+
+.rbc-time-header { display: none; }
+.rbc-time-content { border-top: none; }
+.rbc-current-time-indicator { display: none !important; }
+.rbc-current-time-indicator::before { display: none; }
+.rbc-current-time-indicator::after { display: none; }
+.rbc-today { background-color: rgba(0,0,0,0) }
+.rbc-now { font-weight: normal !important; }
+
 .App {
-  text-align: center;
+  font-size: large;
+  display: grid;
+  grid-row-gap: 2em;
+  grid-column-gap: 2em;
+  grid-template-columns: 1fr 1fr 2fr;
+  grid-template-rows: 1fr 5fr 1fr;
+  grid-template-areas:
+    "header   header   header"
+    "calendar calendar queries"
+    "footer   footer   footer"
 }
 
-.App-logo {
-  display: inline-block;
-  height: 80px;
-}
 
-.App-header {
+.App .header {
+  grid-area: header;
   background-color: var(--dark-green);
-  height: 150px;
+  height: 80px;
   padding: 20px;
   color: white;
 }
 
-.App-intro {
-  font-size: large;
+.App .logo {
+  height: 80px;
 }
 
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.App .header * {
+  display: inline-block;
+}
+
+.App .calendar {
+  grid-area: calendar;
+}
+
+.App .queries {
+  grid-area: queries;
 }
