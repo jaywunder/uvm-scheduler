@@ -1,15 +1,22 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { subscribe, unsubscribe } from '../util/state'
+import { Collapse } from 'react-collapse'
 import fuzzysearch from 'fuzzysearch'
-// import './CourseSearch.css'
+import { subscribe, unsubscribe } from '../util/state'
+import Course from './Course'
+import Toggle from './util/Toggle'
+import Delete from './util/Delete'
+import './CourseSearch.css'
 
-export default class CourseSearchBar extends Component {
+export default class CourseSearch extends Component {
   componentWillMount() {
     const state = this.context.store.getState()
     this.state = {
+      enabled: true,
+      collapsed: false,
       value: '',
       courses: state.courses,
+      sectionStates: [],
       suggestions: []
     }
   }
@@ -40,26 +47,35 @@ export default class CourseSearchBar extends Component {
     if (isCourseNumber)
       return courses.filter(course => search === course.courseNumber)
     else if (isSubjNumSec)
-      // return courses.filter(course => fuzzysearch(search, course.subjNumSec))
       return courses.filter(course => course.subjNumSec.startsWith(search))
     else if (isTitle)
       return courses.filter(course => fuzzysearch(search, course.title.toLowerCase()))
     else return []
   }
 
-  renderSuggestion = suggestion => {
-    return <span>{ suggestion.subject } { suggestion.number }{ suggestion.section } { suggestion.title } ({suggestion.courseNumber})</span>
-  }
-
   onQueryChange = event => {
     const suggestions = this.getSuggestions(event.target.value)
-    this.setState({ suggestions }, () => {
-      if (this.props.onChange) {
-        if (this.hasOneCourse()) this.props.onChange(this.state.suggestions)
-        else this.props.onChange([])
-      }
+    const sectionStates = suggestions.map(() => true)
+    this.setState({ suggestions, sectionStates }, () => {
+      if (this.hasOneCourse()) {
+        (this.props.onChange && this.props.onChange(this.state.suggestions));
+        (this.props.onHasOneCourse && this.props.onHasOneCourse());
+      } else this.props.onChange([])
     })
   }
+
+  onAllToggle = () => this.setState(({ enabled }) => {
+    if (enabled) this.props.onChange([])
+    else this.props.onChange(this.state.suggestions)
+    return { enabled: !enabled }
+  })
+
+  onSectionToggle = i => () =>
+    this.setState(({ sectionStates }) => ({
+      sectionStates: sectionStates.map((state, j) => i === j ? !state : state)
+    }), () => this.props.onChange(
+      this.state.suggestions.filter((_, i) => this.state.sectionStates[i])
+    ))
 
   reduceCourses = () =>
     this.state.suggestions.reduce((sum, sugg) =>
@@ -72,20 +88,21 @@ export default class CourseSearchBar extends Component {
 
   hasOneCourse = () => this.reduceCourses().length === 1
 
+  onCollapseToggle = () =>
+    this.setState( ({collapsed}) => ({ collapsed: !collapsed }) )
+
   render() {
     const { value, suggestions, courses } = this.state;
     const hasOneCourse = this.hasOneCourse()
 
-    return <div>
-      { hasOneCourse && <h3>
-        { suggestions[0].subject }&nbsp;
-        { suggestions[0].number } &nbsp;
-        { suggestions[0].title }
-      </h3>}
-
-      <input onChange={this.onQueryChange} type="text" placeholder="Search... i.e. 'CS 120B', 'Adv Programming: C++', or '94803'"></input>
-
-      { !hasOneCourse &&
+    return <div className="CourseSearch">
+      { !hasOneCourse && <div>
+        <input
+          className="search-input"
+          onChange={this.onQueryChange}
+          type="text"
+          placeholder="Search... i.e. 'CS 120B', 'Adv Programming: C++', or '94803'"
+        ></input>
         <table>
           { this.reduceCourses().map((course, i) => <tr key={i}>
               <td>{ course.subject }</td>
@@ -94,27 +111,26 @@ export default class CourseSearchBar extends Component {
             </tr>
           )}
         </table>
-      }
+      </div>}
 
-      { hasOneCourse &&
-        <table>
-          { this.state.suggestions.map((course, i) =>
-            <tr key={i}>
-              <td>({course.courseNumber})</td>
-              <td>{ course.startTime }-{ course.endTime }</td>
-              <td>{ course.currentEnroll } / { course.maxEnroll }</td>
-              <td>{ course.days }</td>
-              <td>{ course.credits }</td>
-              <td>{ course.building }</td>
-              <td>{ course.instructor }</td>
-              <td>{ course.lecLab }</td>
-            </tr>
-          )}
-        </table>
-
-      }
-
-
+      { hasOneCourse && <div>
+        <div className="util vertical-center">
+          <Toggle state={this.state.enabled} onToggle={this.onAllToggle}/>
+          <Delete onDelete={this.props.onDelete}/>
+          <h4 className="title">
+            { suggestions[0].subject }&nbsp;{ suggestions[0].number }&nbsp;{ suggestions[0].title }
+          </h4>
+        </div>
+        <Collapse isOpened={true && this.state.enabled}>
+          { this.state.suggestions.map((course, i) => <div className="indent">
+            <Toggle
+              state={this.state.sectionStates[i]}
+              onToggle={this.onSectionToggle(i)}
+            />
+            <Course course={course}/>
+          </div>)}
+        </Collapse>
+      </div>}
     </div>
   }
 

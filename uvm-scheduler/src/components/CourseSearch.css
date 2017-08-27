@@ -1,0 +1,27 @@
+.CourseSearch {
+  margin-bottom: 1em;
+}
+
+.CourseSearch .all-enabled {
+  display: inline;
+}
+
+.CourseSearch .indent {
+  margin-left: 1em;
+}
+
+.CourseSearch .indent > * {
+  display: inline;
+}
+
+.CourseSearch .title {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  padding-left: .5em;
+}
+
+.CourseSearch .search-input {
+  width: 80%;
+  margin: auto;
+}

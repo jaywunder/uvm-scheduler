@@ -31,12 +31,12 @@ export default class StateManager extends Component {
   fetchCourses = async () => {
     this.fetchingCourses = true
 
-    // const cors = 'https://cors-anywhere.herokuapp.com/'
-    // const url = 'giraffe.uvm.edu:443/~rgweb/batch/curr_enroll_fall.txt'
+    const cors = 'https://cors-anywhere.herokuapp.com/'
+    const url = 'giraffe.uvm.edu:443/~rgweb/batch/curr_enroll_fall.txt'
     const s = 'String', n = 'Number', b = 'Boolean'
 
-    // const text = await fetch(cors+url).then(response => response.text())
-    const text = await fetch(csvFile).then(response => response.text())
+    const text = await fetch(cors+url).then(response => response.text())
+    // const text = await fetch(csvFile).then(response => response.text())
     const rows = text.split('\n')
       .map(row => row.replace(/("|,| |\d\d:\d\d|@uvm.edu)/g, ''))
 
@@ -45,6 +45,8 @@ export default class StateManager extends Component {
         header: ['subject', 'number', 'title', 'courseNumber', 'section', 'lecLab', 'campcode', 'collcode', 'maxEnroll', 'currentEnroll', 'startTime', 'endTime', 'days', 'credits', 'building', 'room', 'instructor', 'netId', 'email']
       })
       .map((elem, i) => { elem.text = rows[i]; return elem })
+      // .filter(({courseNumber}, i, arr) => i > 0 && courseNumber !== arr[i-1].courseNumber)
+      // .filter(({maxEnroll}) => maxEnroll === 0)
       .map((elem, i) => {
 
         elem.subjNumSec = (elem.subject + elem.number + elem.section).toLowerCase()
