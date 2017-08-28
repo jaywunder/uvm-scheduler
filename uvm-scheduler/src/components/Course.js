@@ -4,6 +4,10 @@ import './Course.css'
 
 export default ({ course }) => {
   const seats = course.maxEnroll - course.currentEnroll
+  const instructor = course.instructor.split(',')
+    .map(s => s.trim())
+    .reverse()
+    .join(' ')
 
   return <div className="Course">
     Section {course.section} &nbsp; ({course.courseNumber}) &nbsp;<br/>
@@ -12,7 +16,7 @@ export default ({ course }) => {
       { seats } seat{seats !== 1 && 's'} left<br/>
       { course.credits } credit{ course.credits !== 1 && 's' }<br/>
       { course.building }<br/>
-      { course.instructor }
+      { instructor }
     </div>
   </div>
 }

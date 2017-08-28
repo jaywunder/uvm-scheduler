@@ -84,7 +84,21 @@ export default class CourseSearch extends Component {
       ) > -1
         ? sum
         : sum.concat(sugg)
-    ,[])
+    , [])
+
+  groupCourses = () => {
+    const { suggestions } = this.state
+    const groups = [[suggestions[0]]]
+    for (let i = 1; i < suggestions.length; i++) {
+      const sugg = suggestions[i]
+      const group = groups[groups.length-1]
+
+      if (sugg.section === group[0].section)
+        group.push(sugg)
+      else groups.push([sugg])
+    }
+    return groups
+  }
 
   hasOneCourse = () => this.reduceCourses().length === 1
 
@@ -94,8 +108,13 @@ export default class CourseSearch extends Component {
   render() {
     const { value, suggestions, courses } = this.state;
     const hasOneCourse = this.hasOneCourse()
+    const isOpened = hasOneCourse && !this.state.collapsed && this.state.enabled
 
-    return <div className="CourseSearch">
+    return <div
+        className="CourseSearch"
+        onMouseEnter={() => this.setState({collapsed: false}, ()=>console.log('enter'))}
+        onMouseLeave={() => this.setState({collapsed: true}, ()=>console.log('leave'))}
+      >
       { !hasOneCourse && <div>
         <input
           className="search-input"
@@ -121,15 +140,26 @@ export default class CourseSearch extends Component {
             { suggestions[0].subject }&nbsp;{ suggestions[0].number }&nbsp;{ suggestions[0].title }
           </h4>
         </div>
-        <Collapse isOpened={true && this.state.enabled}>
-          { this.state.suggestions.map((course, i) => <div className="indent">
+        <Collapse isOpened={isOpened}>
+          <hr />
+          { this.groupCourses().map((courses, i) => <div>
+            { courses.map((course, j) => <div className="indent">
+              <Course course={course}/>
+            </div> )}
+            <hr />
+          </div> )}
+          {/* { this.state.suggestions.map((course, i) => <div className="indent">
             <Toggle
               state={this.state.sectionStates[i]}
               onToggle={this.onSectionToggle(i)}
             />
             <Course course={course}/>
-          </div>)}
+          </div>)} */}
         </Collapse>
+
+        {!isOpened && <div className="arrow-down">
+          ▼
+        </div>}
       </div>}
     </div>
   }
