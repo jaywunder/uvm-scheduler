@@ -36,3 +36,27 @@
   border-top: none;
   color: grey;
 }
+
+.CourseSearch .course-group {
+  margin-left: 1.5em;
+  display: grid;
+  grid-auto-columns: max-content;
+  grid-gap: 0;
+  grid-template:
+    "line line"
+    "toggle info";
+}
+
+.CourseSearch .course-group hr {
+  grid-area: line;
+  width: 100%;
+}
+
+.CourseSearch .course-group input {
+  grid-area: toggle;
+}
+
+.CourseSearch .course-info {
+  grid-area: info;
+  text-align: left;
+}
