@@ -16,7 +16,7 @@ export default class CourseSearch extends Component {
       collapsed: false,
       value: '',
       courses: state.courses,
-      sectionStates: [],
+      sectionStates: {},
       suggestions: []
     }
   }
@@ -58,8 +58,17 @@ export default class CourseSearch extends Component {
     const sectionStates = suggestions.map(() => true)
     this.setState({ suggestions, sectionStates }, () => {
       if (this.hasOneCourse()) {
+
         (this.props.onChange && this.props.onChange(this.state.suggestions));
         (this.props.onHasOneCourse && this.props.onHasOneCourse());
+
+        this.setState({
+          sectionStates: this.groupCourses()
+            .map(([c]) => c.section)
+            .filter((sec, i, arr) => i === 0 || sec !== arr[i-1])
+            .reduce((sum, elem, i) => Object.assign(sum, { [elem]: true }), {})
+        })
+
       } else this.props.onChange([])
     })
   }
@@ -70,11 +79,11 @@ export default class CourseSearch extends Component {
     return { enabled: !enabled }
   })
 
-  onSectionToggle = i => () =>
+  onSectionToggle = section => () =>
     this.setState(({ sectionStates }) => ({
-      sectionStates: sectionStates.map((state, j) => i === j ? !state : state)
+      sectionStates: Object.assign(sectionStates, { [section]: !sectionStates[section] })
     }), () => this.props.onChange(
-      this.state.suggestions.filter((_, i) => this.state.sectionStates[i])
+      this.state.suggestions.filter(sugg => this.state.sectionStates[sugg.section])
     ))
 
   reduceCourses = () =>
@@ -84,7 +93,21 @@ export default class CourseSearch extends Component {
       ) > -1
         ? sum
         : sum.concat(sugg)
-    ,[])
+    , [])
+
+  groupCourses = () => {
+    const { suggestions } = this.state
+    const groups = [[suggestions[0]]]
+    for (let i = 1; i < suggestions.length; i++) {
+      const sugg = suggestions[i]
+      const group = groups[groups.length-1]
+
+      if (sugg.section === group[0].section)
+        group.push(sugg)
+      else groups.push([sugg])
+    }
+    return groups
+  }
 
   hasOneCourse = () => this.reduceCourses().length === 1
 
@@ -94,8 +117,14 @@ export default class CourseSearch extends Component {
   render() {
     const { value, suggestions, courses } = this.state;
     const hasOneCourse = this.hasOneCourse()
+    // const isOpened = true
+    const isOpened = hasOneCourse && !this.state.collapsed && this.state.enabled
 
-    return <div className="CourseSearch">
+    return <div
+        className="CourseSearch"
+        onMouseEnter={() => this.setState({collapsed: false})}
+        onMouseLeave={() => this.setState({collapsed: true})}
+      >
       { !hasOneCourse && <div>
         <input
           className="search-input"
@@ -116,20 +145,36 @@ export default class CourseSearch extends Component {
       { hasOneCourse && <div>
         <div className="util vertical-center">
           <Toggle state={this.state.enabled} onToggle={this.onAllToggle}/>
-          <Delete onDelete={this.props.onDelete}/>
+          <Delete onDelete={() => {this.props.onChange([]); this.props.onDelete()}}/>
           <h4 className="title">
-            { suggestions[0].subject }&nbsp;{ suggestions[0].number }&nbsp;{ suggestions[0].title }
+            { suggestions[0].subject }&nbsp;
+            { suggestions[0].number }&nbsp;
+            { suggestions[0].title }
           </h4>
         </div>
-        <Collapse isOpened={true && this.state.enabled}>
-          { this.state.suggestions.map((course, i) => <div className="indent">
-            <Toggle
-              state={this.state.sectionStates[i]}
-              onToggle={this.onSectionToggle(i)}
-            />
-            <Course course={course}/>
-          </div>)}
+
+        <Collapse isOpened={isOpened}>
+
+          { this.groupCourses().map((group, i) =>
+            <div key={i} className="course-group">
+
+              <hr style={i === 0 ? { border: 'none' } : {}}/>
+
+              <Toggle
+                state={this.state.sectionStates[group[0].section]}
+                onToggle={this.onSectionToggle(group[0].section)}
+              />
+
+              <div className="course-info">
+                { group.map((course, j) =>  <Course key={j} course={course} showSection={j === 0}/> )}
+              </div>
+
+            </div> )}
         </Collapse>
+
+        {!isOpened && <div className="arrow-down">
+          ▼
+        </div>}
       </div>}
     </div>
   }
