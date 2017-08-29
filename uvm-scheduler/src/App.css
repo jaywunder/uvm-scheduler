@@ -3,6 +3,7 @@
 :root {
   --dark-green: #2f5e39;
   --light-green: #8bb138;
+  --unit: 12.5;
 }
 
 * {
@@ -32,7 +33,11 @@ html, body, #root, .App {
   grid-row-gap: 2em;
   grid-column-gap: 2em;
   grid-template-columns: 2em 2fr 1fr 2em;
-  grid-template-rows: auto auto 1em;
+  grid-template-rows:
+    calc(1vh * var(--unit))
+    calc(calc(6.5vh * var(--unit)) - 1em)
+    2em;
+  /*grid-template-rows: auto 1fr 1em;*/
   grid-template-areas:
     "header header header header"
     "padL calendar queries padR"

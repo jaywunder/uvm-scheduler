@@ -4,6 +4,7 @@ import BigCalendar from 'react-big-calendar'
 import TimeGrid from 'react-big-calendar/lib/TimeGrid'
 import moment from 'moment'
 
+import generateSchedule from './algo'
 import tower from './assets/uvm_tower.svg'
 import { subscribe, unsubscribe } from './util/state'
 import CourseSearch from './components/CourseSearch'
@@ -13,13 +14,32 @@ import './App.css';
 
 const colors = ['rgb(64,164,216)','rgb(50,190,180)','rgb(180,195,30)','rgb(255,205,50)','rgb(250,260,40)','rgb(245,100,30)','rgb(220,60,55)','rgb(240,100,120)','rgb(165,100,215)']
 
+
+
+
+
+
+////////////////
+/*
+  REMOVE ALL THE TIMES WHEN A COURSE IS AMICABLE WITH ITSELF
+  THAT SHIT AINT RIGHT
+*/
+///////////////////
+
+
+
+
+
+
+
 class App extends Component {
   componentWillMount() {
     const state = this.context.store.getState()
     this.state = {
       courses: state.courses,
       events: [],
-      courseSearches: []
+      courseSearches: [],
+      activeCourses: [],
     }
 
     this.addCourseSearch()
@@ -51,10 +71,10 @@ class App extends Component {
     })
 
   onQueryChange = i => courses =>
-    this.setState(({ events }) => {
+    this.setState(({ events, activeCourses }) => {
       const newEvents = events.concat()
       newEvents.splice(i, 1, this.coursesToEvents(courses, i))
-      return { events: newEvents }
+      return { events: newEvents, activeCourses: activeCourses.concat(courses) }
     })
 
   coursesToEvents(courses, index) {
@@ -84,6 +104,10 @@ class App extends Component {
 
   render() {
     const events = this.state.events.reduce((sum, arr) => arr ? sum.concat(arr) : sum, [])
+
+    // const allCourses = this.state.activeCourses.reduce(sum =>)
+    console.log('this.state.activeCourses', this.state.activeCourses)
+    console.log(generateSchedule(this.state.activeCourses))
 
     return (
       <div className="App">
